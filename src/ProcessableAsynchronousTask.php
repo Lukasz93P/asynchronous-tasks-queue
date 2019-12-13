@@ -7,5 +7,5 @@ namespace Lukasz93P\tasksQueue;
 
 interface ProcessableAsynchronousTask
 {
-
+    public function id(): string;
 }

@@ -17,6 +17,8 @@
     "require": {
         "php": "^7.3",
         "lukasz93p/async-message-channel": "^1.0",
-        "lukasz93p/object-serializer": "^1.0"
+        "lukasz93p/object-serializer": "^1.0",
+        "ext-mysqli": "*",
+        "symfony/console": "^5.0"
     }
 }

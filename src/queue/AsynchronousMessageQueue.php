@@ -11,6 +11,7 @@ use Lukasz93P\AsyncMessageChannel\exceptions\MessagePublishingFailed;
 use Lukasz93P\AsyncMessageChannel\exceptions\MessageTemporaryUnprocessable;
 use Lukasz93P\AsyncMessageChannel\MessageHandler;
 use Lukasz93P\AsyncMessageChannel\ProcessableMessage;
+use Lukasz93P\tasksQueue\deduplication\ProcessedTasksRegistry;
 use Lukasz93P\tasksQueue\ProcessableAsynchronousTask;
 use Lukasz93P\tasksQueue\queue\exceptions\EnqueuingFailed;
 use Lukasz93P\tasksQueue\queue\exceptions\ObjectInsideTasksQueueIsNotAnAsynchronousTask;
@@ -30,8 +31,12 @@ class AsynchronousMessageQueue extends BaseQueue implements AsynchronousQueue, M
      */
     private $serializableMessageConverter;
 
-    public function __construct(AsynchronousMessageChannel $asynchronousMessageChannel, SerializableMessageConverter $serializableMessageConverter)
-    {
+    public function __construct(
+        AsynchronousMessageChannel $asynchronousMessageChannel,
+        SerializableMessageConverter $serializableMessageConverter,
+        ProcessedTasksRegistry $processedTasksRegistry
+    ) {
+        parent::__construct($processedTasksRegistry);
         $this->asynchronousMessageChannel = $asynchronousMessageChannel;
         $this->serializableMessageConverter = $serializableMessageConverter;
     }
