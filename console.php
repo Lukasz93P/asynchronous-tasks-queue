@@ -5,7 +5,7 @@ use Lukasz93P\tasksQueue\deduplication\commands\CreateProcessedTasksRegistryTabl
 use Lukasz93P\tasksQueue\deduplication\commands\RemoveOldEntriesFromProcessedTasksRegistryCommand;
 use Symfony\Component\Console\Application;
 
-require_once './vendor/autoload.php';
+require_once '../../autoload.php';
 
 $consoleApplication = new Application();
 $consoleApplication->add(new CreateProcessedTasksRegistryTableCommand());
