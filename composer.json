@@ -19,6 +19,6 @@
         "lukasz93p/async-message-channel": "^1.0",
         "lukasz93p/object-serializer": "^1.0",
         "ext-mysqli": "*",
-        "symfony/console": "^5.0"
+        "symfony/console": "4.3"
     }
 }
