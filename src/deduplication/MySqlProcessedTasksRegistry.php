@@ -55,7 +55,7 @@ class MySqlProcessedTasksRegistry implements ProcessedTasksRegistry
     {
         $result = $this->mySqlConnection->query(
             'CREATE TABLE IF NOT EXISTS processed_tasks_registry (
-                    task_id VARCHAR(55) NOT NULL UNIQUE,
+                    task_id VARCHAR(55) NOT NULL,
                     registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                     INDEX(registered_at)
                     )'
