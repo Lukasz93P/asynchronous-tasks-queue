@@ -11,7 +11,8 @@ interface AsynchronousQueue extends Queue
 {
     /**
      * @param string $queueKey
+     * @param int $timeoutInSeconds
      * @throws Throwable
      */
-    public function startTasksProcessingLoop(string $queueKey): void;
+    public function startTasksProcessingLoop(string $queueKey, int $timeoutInSeconds = 0): void;
 }

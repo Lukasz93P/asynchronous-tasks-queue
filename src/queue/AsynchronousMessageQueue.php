@@ -50,9 +50,9 @@ class AsynchronousMessageQueue extends BaseQueue implements AsynchronousQueue, M
         }
     }
 
-    public function startTasksProcessingLoop(string $queueKey): void
+    public function startTasksProcessingLoop(string $queueKey, int $timeoutInSeconds = 0): void
     {
-        $this->asynchronousMessageChannel->startProcessingQueue($this, $queueKey);
+        $this->asynchronousMessageChannel->startProcessingQueue($this, $queueKey, $timeoutInSeconds);
     }
 
     public function handle(ProcessableMessage $message): void
