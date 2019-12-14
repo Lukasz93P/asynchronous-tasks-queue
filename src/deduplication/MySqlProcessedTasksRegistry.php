@@ -7,11 +7,10 @@ namespace Lukasz93P\tasksQueue\deduplication;
 
 use Lukasz93P\tasksQueue\deduplication\exceptions\RegistrySavingFailed;
 use Lukasz93P\tasksQueue\deduplication\exceptions\RegistryUnavailable;
-use Lukasz93P\tasksQueue\deduplication\tableCreator\ProcessedTasksTableCreator;
 use mysqli;
 use RuntimeException;
 
-class MySqlProcessedTasksRegistry implements ProcessedTasksRegistry, ProcessedTasksTableCreator
+class MySqlProcessedTasksRegistry implements ProcessedTasksRegistry
 {
     /**
      * @var mysqli
@@ -47,7 +46,12 @@ class MySqlProcessedTasksRegistry implements ProcessedTasksRegistry, ProcessedTa
         return (bool)$queryResult->num_rows;
     }
 
-    public function createTable(): void
+    public function removeEntriesOlderThan(int $daysNumber): void
+    {
+        $this->mySqlConnection->query("DELETE FROM processed_tasks_registry WHERE registered_at < (CURDATE() - INTERVAL $daysNumber DAY)");
+    }
+
+    public function initialize(): void
     {
         $result = $this->mySqlConnection->query(
             'CREATE TABLE IF NOT EXISTS processed_tasks_registry (

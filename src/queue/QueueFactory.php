@@ -9,7 +9,6 @@ use Lukasz93P\AsyncMessageChannel\AsynchronousMessageChannelFactory;
 use Lukasz93P\objectSerializer\ObjectSerializerFactory;
 use Lukasz93P\tasksQueue\deduplication\ProcessedTasksRegistry;
 use Lukasz93P\tasksQueue\deduplication\ProcessedTasksRegistryFactory;
-use Lukasz93P\tasksQueue\deduplication\tableCreator\ProcessedTasksTableCreatorFactory;
 use Lukasz93P\tasksQueue\serializableMessageConverter\SerializableMessageConverterBasedOnObjectSerializer;
 use Psr\Log\LoggerInterface;
 
@@ -35,6 +34,16 @@ final class QueueFactory
                     return false;
                 }
 
+                public function initialize(): void
+                {
+                    return;
+                }
+
+                public function removeEntriesOlderThan(int $daysNumber): void
+                {
+                    return;
+                }
+
             }
         );
     }
@@ -42,7 +51,7 @@ final class QueueFactory
     public static function publisherAndSubscriber(
         LoggerInterface $logger,
         array $tasksIdentificationKeysToClassNamesMapping,
-        string $processedTasksRegistryType = ProcessedTasksTableCreatorFactory::TYPE_MY_SQL
+        string $processedTasksRegistryType = ProcessedTasksRegistryFactory::TYPE_MY_SQL
     ): AsynchronousQueue {
         return new AsynchronousMessageQueue(
             AsynchronousMessageChannelFactory::withLogger($logger),
