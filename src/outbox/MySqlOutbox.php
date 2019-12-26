@@ -34,11 +34,11 @@ class MySqlOutbox implements Outbox
 
     public function initialize(): void
     {
-        $result = $this->connection->command(
+        $result = $this->connection->query(
             'CREATE TABLE IF NOT EXISTS ' . self::TABLE_NAME . ' (
                     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                     registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    updated_at TIMESTAMP DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
                     body TEXT,
                     published BOOLEAN DEFAULT 0,
                     INDEX(published)
@@ -61,17 +61,16 @@ class MySqlOutbox implements Outbox
 
         $valuesToInsert = [];
         foreach ($tasks as $task) {
-            $valuesToInsert = "({$this->serializer->serialize($task)})";
+            $valuesToInsert[] = "('{$this->serializer->serialize($task)}')";
         }
-
-        if ($this->connection->query('INSERT INTO ' . self::TABLE_NAME . ' VALUES ' . implode(', ', $valuesToInsert)) === false) {
+        if ($this->connection->query(str_replace('\\', '\\\\', 'INSERT INTO ' . self::TABLE_NAME . ' (body) VALUES ' . implode(', ', $valuesToInsert))) === false) {
             throw TasksAddingFailed::reasonNotKnown();
         }
     }
 
     public function publish(Queue $queue): void
     {
-        $unpublishedTasks = $this->connection->command('SELECT * FROM ' . self::TABLE_NAME . " WHERE published = 0");
+        $unpublishedTasks = $this->connection->query('SELECT * FROM ' . self::TABLE_NAME . " WHERE published = 0");
         if ($unpublishedTasks === false) {
             throw new RuntimeException('MySql error has occurred');
         }
@@ -79,13 +78,13 @@ class MySqlOutbox implements Outbox
         $messages = [];
         $ids = [];
 
-        foreach ($unpublishedTasks->fetch_all() as $row) {
-            $messages[] = $this->serializer->deserialize($row->data);
-            $ids[] = $row->id;
+        foreach ($unpublishedTasks->fetch_all(MYSQLI_ASSOC) as $row) {
+            $messages[] = $this->serializer->deserialize($row['body']);
+            $ids[] = $row['id'];
         }
 
         $queue->enqueue($messages);
-        $this->connection->command('UPDATE ' . self::TABLE_NAME . ' SET published = 1 WHERE id IN(' . implode(',', $ids));
+        $this->connection->query('UPDATE ' . self::TABLE_NAME . ' SET published = 1 WHERE id IN(' . implode(', ', $ids) . ')');
     }
 
 }
