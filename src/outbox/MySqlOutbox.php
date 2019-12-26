@@ -15,6 +15,7 @@ use RuntimeException;
 class MySqlOutbox implements Outbox
 {
     private const TABLE_NAME = 'outbox_lukasz93p';
+
     /**
      * @var Connection
      */
