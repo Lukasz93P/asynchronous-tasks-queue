@@ -25,12 +25,12 @@ class RemoveOldEntriesFromProcessedTasksRegistryCommand extends CommandWitProces
         try {
             $this->getProcessedTasksRegistry($input)->removeEntriesOlderThan((int)$input->getArgument(self::ARGUMENT_DELETE_ENTRIES_OLDER_THAN_DAYS_NUMBER));
 
-            return 1;
+            return 0;
         } catch (Throwable $throwable) {
             $output->writeln('Removing old entries from processed tasks registry failed.');
             $output->writeln($throwable->getMessage());
 
-            return 0;
+            return 1;
         }
     }
 

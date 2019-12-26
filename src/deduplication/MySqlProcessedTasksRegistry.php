@@ -5,32 +5,28 @@ declare(strict_types=1);
 namespace Lukasz93P\tasksQueue\deduplication;
 
 
+use Lukasz93P\tasksQueue\connection\Connection;
 use Lukasz93P\tasksQueue\deduplication\exceptions\RegistrySavingFailed;
 use Lukasz93P\tasksQueue\deduplication\exceptions\RegistryUnavailable;
-use mysqli;
 use RuntimeException;
 
 class MySqlProcessedTasksRegistry implements ProcessedTasksRegistry
 {
-    /**
-     * @var mysqli
-     */
-    private $mySqlConnection;
+    private const TABLE_NAME = 'processed_tasks_registry_lukasz93p';
 
-    public function __construct()
+    /**
+     * @var Connection
+     */
+    private $connection;
+
+    public function __construct(Connection $connection)
     {
-        $this->mySqlConnection = new mysqli(
-            getenv('TASKS_DEDUPLICATION_DATABASE_HOST') ?: 'localhost',
-            getenv('TASKS_DEDUPLICATION_DATABASE_USER') ?: 'root',
-            getenv('TASKS_DEDUPLICATION_DATABASE_PASSWORD') ?: '',
-            getenv('TASKS_DEDUPLICATION_DATABASE_NAME') ?: 'code_quality_pacage_lifecycle',
-            (int)(getenv('TASKS_DEDUPLICATION_DATABASE_PORT') ?: 3306),
-        );
+        $this->connection = $connection;
     }
 
     public function save(string $taskId): void
     {
-        $wasInserted = $this->mySqlConnection->query("INSERT INTO processed_tasks_registry(task_id) VALUES('$taskId')");
+        $wasInserted = $this->connection->query('INSERT INTO ' . self::TABLE_NAME . "(task_id) VALUES('$taskId')");
         if ($wasInserted === false) {
             throw RegistrySavingFailed::fromTaskId($taskId);
         }
@@ -38,7 +34,7 @@ class MySqlProcessedTasksRegistry implements ProcessedTasksRegistry
 
     public function exists(string $taskId): bool
     {
-        $queryResult = $this->mySqlConnection->query("SELECT task_id FROM processed_tasks_registry WHERE task_id = '$taskId'");
+        $queryResult = $this->connection->query('SELECT task_id FROM ' . self::TABLE_NAME . " WHERE task_id = '$taskId'");
         if ($queryResult === false) {
             throw RegistryUnavailable::reasonNotKnown();
         }
@@ -48,13 +44,13 @@ class MySqlProcessedTasksRegistry implements ProcessedTasksRegistry
 
     public function removeEntriesOlderThan(int $daysNumber): void
     {
-        $this->mySqlConnection->query("DELETE FROM processed_tasks_registry WHERE registered_at < (CURDATE() - INTERVAL $daysNumber DAY)");
+        $this->connection->query('DELETE FROM ' . self::TABLE_NAME . " WHERE registered_at < (CURDATE() - INTERVAL $daysNumber DAY)");
     }
 
     public function initialize(): void
     {
-        $result = $this->mySqlConnection->query(
-            'CREATE TABLE IF NOT EXISTS processed_tasks_registry (
+        $result = $this->connection->query(
+            'CREATE TABLE IF NOT EXISTS ' . self::TABLE_NAME . ' (
                     task_id VARCHAR(55) NOT NULL,
                     registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                     INDEX(registered_at)

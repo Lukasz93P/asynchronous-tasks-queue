@@ -17,7 +17,7 @@ abstract class CommandWitProcessedTasksRegistryType extends Command
 
     protected function configure(): void
     {
-        $this->setName($this->name())
+        $this->setName("deduplication-{$this->name()}")
             ->addArgument(self::ARGUMENT_DATABASE_TYPE, InputArgument::OPTIONAL, '', ProcessedTasksRegistryFactory::TYPE_MY_SQL);
     }
 

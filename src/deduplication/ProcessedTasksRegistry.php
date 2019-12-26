@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace Lukasz93P\tasksQueue\deduplication;
 
 
-use Exception;
 use Lukasz93P\tasksQueue\deduplication\exceptions\RegistrySavingFailed;
 use Lukasz93P\tasksQueue\deduplication\exceptions\RegistryUnavailable;
+use RuntimeException;
 
 interface ProcessedTasksRegistry
 {
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function initialize(): void;
 

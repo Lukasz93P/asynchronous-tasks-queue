@@ -17,12 +17,12 @@ class CreateProcessedTasksRegistryTableCommand extends CommandWitProcessedTasksR
             $this->getProcessedTasksRegistry($input)->initialize();
             $output->writeln('Processed tasks registry successfully created.');
 
-            return 1;
+            return 0;
         } catch (Throwable $throwable) {
             $output->writeln('Creation of processed tasks registry failed');
             $output->writeln($throwable->getMessage());
 
-            return 0;
+            return 1;
         }
     }
 
