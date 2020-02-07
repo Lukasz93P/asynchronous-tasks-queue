@@ -19,7 +19,7 @@
         "lukasz93p/async-message-channel": "1.*",
         "lukasz93p/object-serializer": "^1.0",
         "ext-mysqli": "*",
-        "symfony/console": "*",
+        "symfony/console": "4.3.*",
         "doctrine/collections": "^1.6",
         "nesbot/carbon": "^2.28",
         "beberlei/assert": "^3.2",
